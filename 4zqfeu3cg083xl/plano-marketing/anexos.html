@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>Plano de marketing ISC</title>
+<style>
+:root{--bg:#F6F8FA;--card:#fff;--ink:#0C0F14;--mut:#5B6470;--line:#E4E7EB;--acc:#FF6A1A;--accd:#B33E0A}
+@media (prefers-color-scheme:dark){:root{--bg:#0C0F14;--card:#161A21;--ink:#F2F4F7;--mut:#9AA3AE;--line:#262C35}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif;padding:16px}
+.card{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:32px 28px}
+h1{font-weight:600;font-size:24px;margin:0 0 6px}p{margin:0 0 24px;color:var(--mut);font-size:16px;line-height:1.5}
+label{display:block;font-size:14px;font-weight:600;margin:0 0 6px}
+input{width:100%;font:inherit;font-size:17px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;margin:0 0 18px;background:var(--bg);color:var(--ink)}
+input:focus{outline:2px solid var(--acc);outline-offset:1px}
+button{width:100%;font:inherit;font-size:17px;font-weight:600;padding:13px;border:0;border-radius:8px;background:var(--acc);color:#fff;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}.err{color:var(--accd);font-size:15px;min-height:22px;margin-top:14px}
+</style></head><body>
+<form class="card" id="f" autocomplete="on"><h1>Plano de marketing ISC</h1>
+<p>Acesso restrito. Entre com o login e a senha que você recebeu.</p>
+<label for="u">Login</label><input id="u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+<label for="s">Senha</label><input id="s" name="password" type="password" autocomplete="current-password" required>
+<button id="b" type="submit">Entrar</button><div class="err" id="e" role="alert"></div></form>
+<script>
+const P={salt:"0XWpgvjCb1qFs44sSNhXJg==",iv:"bPw8cW3Dq569v7cq",it:310000,ct:"zEAoGsUTyJIZy22jIIyrZaWkhvYkDT/Ey2Se/tcm/UrUcvAwdVMgpXDreqNBwwTSK/zx6RwywxH1MCh4GIZpU820pB74ijjlfd8FY5nNa9XxWQsY8JP9XlzuKMGHElVOj58j0+Z9iBbHnn1YPyWTF+SvS0xiEB6FlIpt39Gjf52YQXsxACmCR4HR+gWOZ/ZjCvP/mshJHRLwSIVARS1E2MGw5nyMq7FBjb8KmubA5WCsqNWfZqIlYWFvf6eQt/HvsAFu5tc8ec46BCoSkMSKsyg79DODEly24xXZaYQesdmCLXGYHQZCGUVY6HuYlJuQxul9GiIFyDC86HqCjV0wIHxuTpw0Y6MNQfQn08kXnpAB9bkxDg7vfI20UaBX4g9LL73UVg1SpMuJtw6gcrV4gJljSwnHFv81j69ru6XRryA4lfPJ5e3lLRApM+CC2/wBZbECSwcsR0A177jxuzyKLBjXt98/JknpWrEK478JTb8r0fL5BlJ2RdsjwFbTlo3CbbSJ"};
+const d64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function abrir(l,s){const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(l+'\n'+s),'PBKDF2',false,['deriveKey']);
+const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:d64(P.salt),iterations:P.it,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:d64(P.iv)},key,d64(P.ct)));}
+document.getElementById('f').addEventListener('submit',async ev=>{ev.preventDefault();const b=document.getElementById('b'),e=document.getElementById('e');
+b.disabled=true;b.textContent='Abrindo...';e.textContent='';
+try{const h=await abrir(document.getElementById('u').value.trim(),document.getElementById('s').value);document.open();document.write(h);document.close();}
+catch(_){e.textContent='Login ou senha incorretos.';b.disabled=false;b.textContent='Entrar';}});
+</script></body></html>

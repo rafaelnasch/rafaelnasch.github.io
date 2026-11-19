@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>PDR ISC | GrowAI</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;min-height:100%;background:#fff;color:#222;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#state{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}.message{width:100%;max-width:520px;border-top:3px solid #ff6a1a;padding-top:24px}h1{font-size:28px;line-height:1.25;margin:0 0 14px}p{font-size:18px;line-height:1.65;margin:0;overflow-wrap:anywhere}iframe{display:block;width:100%;height:100vh;height:100dvh;border:0}[hidden]{display:none!important}@media(max-width:430px){h1{font-size:25px}p{font-size:17px}}
+</style>
+</head>
+<body>
+<main id="state" aria-live="polite"><div class="message"><h1 id="status-title">Abrindo relatório</h1><p id="status-text">Aguarde um instante.</p></div></main>
+<iframe id="report" title="Plano diretor de reorganização do ISC" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" hidden></iframe>
+<script>
+(async()=>{
+  const state=document.getElementById('state');
+  const title=document.getElementById('status-title');
+  const message=document.getElementById('status-text');
+  const keyText=new URLSearchParams(location.hash.slice(1)).get('k');
+  const show=(heading,text)=>{title.textContent=heading;message.textContent=text;};
+  if(!keyText||!/^[A-Za-z0-9_-]{43}$/.test(keyText)){
+    show('Relatório protegido','Abra o endereço completo que foi compartilhado com você para visualizar o PDR.');
+    return;
+  }
+  const decode=text=>Uint8Array.from(atob(text.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-text.length%4)%4)),c=>c.charCodeAt(0));
+  try{
+    const response=await fetch('./report.enc',{credentials:'omit',cache:'no-cache',referrerPolicy:'no-referrer'});
+    if(!response.ok)throw new Error('Arquivo indisponível');
+    const key=await crypto.subtle.importKey('raw',decode(keyText),'AES-GCM',false,['decrypt']);
+    const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:decode('_2FY_NnLn9cos5IY'),tagLength:128},key,await response.arrayBuffer());
+    const frame=document.getElementById('report');
+    const blobUrl=URL.createObjectURL(new Blob([plain],{type:'text/html;charset=utf-8'}));
+    frame.addEventListener('load',()=>{state.hidden=true;frame.hidden=false;URL.revokeObjectURL(blobUrl);},{once:true});
+    frame.src=blobUrl;
+  }catch(error){
+    show('Não foi possível abrir o relatório','Confira se o link está completo e tente novamente.');
+  }
+})();
+</script>
+</body>
+</html>
